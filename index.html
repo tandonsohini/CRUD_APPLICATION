@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CRUD App</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body{
+      font-family:'Poppins',sans-serif;
+      background:linear-gradient(135deg,#38bdf8,#a78bfa);
+      margin:0;padding:40px;
+      color:#1e293b;
+    }
+    h1{text-align:center;margin-bottom:30px;color:#fff;font-size:2.2rem}
+    .form{
+      display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:30px
+    }
+    input{
+      padding:12px 14px;border-radius:8px;border:none;min-width:220px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.15);
+    }
+    button{
+      padding:12px 18px;border-radius:8px;border:none;cursor:pointer;font-weight:600;
+      background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;transition:.3s;
+      box-shadow:0 3px 12px rgba(0,0,0,0.2);
+    }
+    button:hover{transform:translateY(-2px)}
+
+    table{
+      width:100%;max-width:800px;margin:auto;border-collapse:collapse;background:#fff;
+      border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.2)
+    }
+    th,td{padding:14px 16px;text-align:left}
+    thead{background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff}
+    tbody tr:nth-child(even){background:#f9fafb}
+
+    .actions button{
+      background:linear-gradient(135deg,#a78bfa,#6366f1);
+      margin-right:6px;padding:8px 12px;font-size:0.85rem
+    }
+    .actions button:hover{background:linear-gradient(135deg,#7c3aed,#4338ca)}
+
+    .empty{text-align:center;padding:20px;color:#64748b}
+  </style>
+</head>
+<body>
+  <h1>✨ CRUD Application ✨</h1>
+
+  <div class="form">
+    <input type="text" id="name" placeholder="Enter name">
+    <input type="text" id="email" placeholder="Enter email">
+    <button onclick="addRecord()">Save</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Email</th><th>Actions</th></tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <script>
+    let records = JSON.parse(localStorage.getItem('records')) || [];
+    let editIndex = -1;
+
+    function renderTable(){
+      const body=document.getElementById('tableBody');
+      body.innerHTML='';
+      if(records.length===0){
+        body.innerHTML='<tr><td colspan="3" class="empty">No records yet. Add one above!</td></tr>';
+        return;
+      }
+      records.forEach((rec,i)=>{
+        body.innerHTML+=`<tr>
+          <td>${rec.name}</td>
+          <td>${rec.email}</td>
+          <td class="actions">
+            <button onclick="editRecord(${i})">Edit</button>
+            <button onclick="deleteRecord(${i})">Delete</button>
+          </td>
+        </tr>`;
+      });
+      localStorage.setItem('records',JSON.stringify(records));
+    }
+
+    function addRecord(){
+      const name=document.getElementById('name').value.trim();
+      const email=document.getElementById('email').value.trim();
+      if(!name||!email) return alert('Please fill out both fields');
+
+      if(editIndex===-1){
+        records.push({name,email});
+      } else {
+        records[editIndex]={name,email};
+        editIndex=-1;
+      }
+
+      document.getElementById('name').value='';
+      document.getElementById('email').value='';
+      renderTable();
+    }
+
+    function editRecord(i){
+      document.getElementById('name').value=records[i].name;
+      document.getElementById('email').value=records[i].email;
+      editIndex=i;
+    }
+
+    function deleteRecord(i){
+      if(confirm('Delete this record?')){
+        records.splice(i,1);
+        renderTable();
+      }
+    }
+
+    renderTable();
+  </script>
+</body>
+</html>
